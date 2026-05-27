@@ -1,0 +1,15 @@
+{
+  "name": "bandarq-royale",
+  "version": "1.0.0",
+  "description": "Game Kartu BandarQ dengan Railway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "bcryptjs": "^2.4.3",
+    "sqlite3": "^5.1.6"
+  }
+}
