@@ -1,7 +1,7 @@
 {
   "name": "bandarq-royale",
   "version": "1.0.0",
-  "description": "Game Kartu BandarQ dengan Railway",
+  "description": "BandarQ Royale with SQLite",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
