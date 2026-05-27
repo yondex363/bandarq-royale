@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BandarQRoyale</string>
+    <string name="title_activity_main">BandarQRoyale</string>
+    <string name="package_name">com.bandarq.royale</string>
+    <string name="custom_url_scheme">com.bandarq.royale</string>
+</resources>

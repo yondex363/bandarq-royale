@@ -1,28 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#302b63">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- SEO META TAGS (PENTING) -->
-  <title>BandarQ Royale - Game Bandar Kartu Online Terbaik 2025</title>
-  <meta name="description" content="Mainkan BandarQ online gratis dengan 100 meja, bot bandar, dan sistem bank & WA. Game kartu bandar terpopuler di Indonesia.">
-  <meta name="keywords" content="bandarq, bandar kartu, game kartu online, bandarq royale, kartu online, bandarq gratis">
-  <meta name="robots" content="index, follow">
-  <meta name="author" content="Fizri Normansyah">
-  
-  <!-- OPEN GRAPH (Agar link bagus di WA/FB) -->
-  <meta property="og:title" content="BandarQ Royale - Main Bandar Kartu Online">
-  <meta property="og:description" content="Game BandarQ dengan 100 meja, bot bandar, dan sistem bank & WA.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bandarq-royale-2.onrender.com">
-  <meta property="og:image" content="https://bandarq-royale-2.onrender.com/logo.png"> <!-- Kalau ada logo -->
-</head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BandarQ Royale ♛</title>
@@ -37,6 +15,40 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* --- Loading Animation --- */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0c29;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: #f1c40f;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .container { max-width: 600px; margin: 0 auto; padding: 20px; width: 100%; }
         .card {
             background: rgba(255,255,255,0.07);
@@ -135,24 +147,48 @@
         .header .user-info { text-align: right; font-size: 12px; opacity: 0.8; }
         .header .user-info .balance { font-weight: bold; color: #f1c40f; font-size: 16px; }
 
-        /* --- Lobby --- */
+        /* --- Lobby - Improved Table Cards --- */
         .section-title { font-size: 18px; margin: 15px 0 10px 5px; opacity: 0.8; }
-        .table-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .table-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
         .table-card {
-            background: rgba(255,255,255,0.07);
+            background: linear-gradient(145deg, #1e1e3f, #2a2a5e);
             border-radius: 15px;
-            padding: 12px 8px;
+            padding: 15px 10px;
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
             border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 110px;
         }
+        .table-card:hover { transform: translateY(-5px); border-color: #f1c40f; }
         .table-card:active { transform: scale(0.95); }
+        
+        .table-card .stake-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .table-card .stake-icon { font-size: 24px; }
         .table-card .stake { font-size: 18px; font-weight: bold; color: #f1c40f; }
-        .table-card .info { font-size: 11px; color: #aaa; }
+        
+        .table-card .info { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 5px; }
+        .table-card .info .player-icon { font-size: 14px; }
+        
         .table-card .status {
-            display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;
-            margin-top: 4px;
+            display: inline-block; padding: 4px 20px; border-radius: 20px; font-size: 11px; font-weight: bold;
+            margin-top: 6px;
+            width: 100%;
+            text-align: center;
         }
         .table-card .status.open { background: #2ecc71; color: white; }
         .table-card .status.playing { background: #e74c3c; color: white; }
@@ -180,15 +216,29 @@
             width: 38px; height: 38px; border-radius: 50%; margin: 0 auto;
             display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;
             border: 2px solid #fff; background: #444;
+            overflow: hidden;
+        }
+        .seat .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .seat .avatar.bot { border-color: #e74c3c; background: #c0392b; }
         .seat .avatar.me { border-color: #3498db; background: #2980b9; }
         .seat .name { margin-top: 2px; font-weight: bold; text-shadow: 0 1px 4px black; }
         .seat .chips { font-size: 9px; color: #f1c40f; }
-        .seat .cards { display: flex; justify-content: center; gap: 2px; margin-top: 2px; }
+        
+        /* Improved Card Spacing */
+        .seat .cards {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
         .seat .card {
-            background: #fff; color: #000; width: 20px; height: 28px;
-            border-radius: 3px; font-size: 8px; line-height: 28px; text-align: center; font-weight: bold;
+            background: #fff; color: #000; width: 22px; height: 32px;
+            border-radius: 3px; font-size: 9px; line-height: 32px; text-align: center; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         .controls { text-align: center; margin-top: 20px; padding-bottom: 30px; }
         .controls .btn { margin: 5px; }
@@ -215,18 +265,17 @@
             .header .title { font-size: 16px; }
             .table-area { width: 220px; height: 220px; }
             .seat { width: 60px; }
-            .seat .avatar { width: 30px; height: 30px; font-size: 11px; }
-            .seat .card { width: 16px; height: 22px; font-size: 7px; line-height: 22px; }
+            .seat .avatar { width: 32px; height: 32px; font-size: 11px; }
+            .seat .card { width: 18px; height: 24px; font-size: 7px; line-height: 24px; }
         }
     </style>
 </head>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/serviceworker.js');
-  }
-</script>
 <body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+    <div class="loader"></div>
+</div>
 
 <!-- LANDING PAGE -->
 <div id="landingPage">
@@ -282,7 +331,7 @@
             <div class="balance">💰 <span id="globalBalance">0</span></div>
             <div style="margin-top:4px; display:flex; gap:5px; justify-content:flex-end;">
                 <button class="btn btn-blue" style="padding:4px 12px; font-size:11px;" onclick="showProfile()">👤 Profil</button>
-                <button class="btn btn-red" style="padding:4px 12px; font-size:11px;" onclick="showAdmin()">⚙️ Admin</button>
+                <button class="btn btn-red" id="adminButton" style="padding:4px 12px; font-size:11px; display:none;" onclick="showAdmin()">⚙️ Admin</button>
                 <button class="btn" style="padding:4px 12px; font-size:11px; background:#555;" onclick="logout()">Keluar</button>
             </div>
         </div>
@@ -335,12 +384,20 @@
             <option value="Other">Lainnya</option>
         </select>
         <input class="input-field" id="profileBankNumber" placeholder="Nomor Rekening">
+        <input class="input-field" id="profileAvatar" placeholder="Link Foto Profil (URL)">
         <button class="btn btn-gold" style="width:100%;" onclick="saveProfile()">Simpan</button>
         <button class="btn" style="width:100%; margin-top:8px; background:#555;" onclick="closeProfile()">Batal</button>
     </div>
 </div>
 
 <script>
+    // HIDE LOADING OVERLAY
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }, 800);
+    });
+
     const socket = io();
     let currentUser = null;
     let currentTableId = null;
@@ -438,6 +495,12 @@
         if (currentUser) {
             document.getElementById('userName').innerText = currentUser.name;
             document.getElementById('globalBalance').innerText = currentUser.balance;
+            // Show admin button only for admin
+            if (currentUser.isAdmin) {
+                document.getElementById('adminButton').style.display = 'inline-block';
+            } else {
+                document.getElementById('adminButton').style.display = 'none';
+            }
         }
     }
 
@@ -455,9 +518,24 @@
             const isFull = t.playerCount >= t.maxPlayers;
             const statusClass = t.status === 'waiting' && !isFull ? 'open' : (t.status === 'playing' ? 'playing' : 'full');
             const statusText = t.status === 'waiting' ? (isFull ? 'Penuh' : 'Buka') : (t.status === 'playing' ? 'Main' : 'Penuh');
+            
+            // Custom Logo/Icon for each room based on stake
+            let icon = '🃏';
+            let stakeLabel = formatNumber(t.stake);
+            if (t.stake >= 50000) icon = '💎';
+            else if (t.stake >= 10000) icon = '👑';
+            else if (t.stake >= 5000) icon = '🪙';
+            else icon = '💰';
+
             card.innerHTML = `
-                <div class="stake">💰 ${formatNumber(t.stake)}</div>
-                <div class="info">👤 ${t.playerCount}/${t.maxPlayers}</div>
+                <div class="stake-wrapper">
+                    <div class="stake-icon">${icon}</div>
+                    <div class="stake">${stakeLabel}</div>
+                </div>
+                <div class="info">
+                    <span class="player-icon">👤</span>
+                    <span>${t.playerCount}/${t.maxPlayers}</span>
+                </div>
                 <div class="status ${statusClass}">${statusText}</div>
             `;
             if (!isFull && t.status === 'waiting') {
@@ -528,9 +606,16 @@
             let avatarClass = 'avatar';
             if (p.isBot) avatarClass += ' bot';
             if (p.id === currentUser.id) avatarClass += ' me';
+            
+            // Use actual avatar image if available
+            let avatarContent = `<div class="${avatarClass}">${p.name[0]}</div>`;
+            if (p.avatar) {
+                avatarContent = `<div class="${avatarClass}"><img src="${p.avatar}" alt="${p.name}"></div>`;
+            }
+
             let cardHtml = p.hand.map(c => `<div class="card">${c.rank === 1 ? 'A' : c.rank > 10 ? ['J','Q','K'][c.rank-11] : c.rank}</div>`).join('');
             seat.innerHTML = `
-                <div class="${avatarClass}">${p.name[0]}</div>
+                ${avatarContent}
                 <div class="name">${p.name}</div>
                 <div class="chips">💰 ${formatNumber(p.chips)}</div>
                 <div class="cards">${cardHtml}</div>
@@ -599,6 +684,7 @@
         document.getElementById('profileEmail').value = currentUser.email || '';
         document.getElementById('profileBank').value = currentUser.bank_name || '';
         document.getElementById('profileBankNumber').value = currentUser.bank_number || '';
+        document.getElementById('profileAvatar').value = currentUser.avatar || '';
         document.getElementById('profileModal').style.display = 'flex';
     }
 
@@ -612,12 +698,13 @@
         const email = document.getElementById('profileEmail').value.trim();
         const bank_name = document.getElementById('profileBank').value;
         const bank_number = document.getElementById('profileBankNumber').value.trim();
+        const avatar = document.getElementById('profileAvatar').value.trim();
         if (!name) return alert('Nama tidak boleh kosong');
         try {
             const res = await fetch('/api/profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, name, phone_wa, email, bank_name, bank_number })
+                body: JSON.stringify({ userId: currentUser.id, name, phone_wa, email, bank_name, bank_number, avatar })
             });
             const data = await res.json();
             if (data.success) {
@@ -625,6 +712,10 @@
                 updateHeader();
                 closeProfile();
                 alert('Profil berhasil diperbarui!');
+                // Reload table display to show new avatar if user is in a game
+                if (currentTableId) {
+                    socket.emit('requestTables');
+                }
             } else {
                 alert(data.error || 'Gagal');
             }

@@ -19,7 +19,7 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB error:', err));
 
-// --- Schema User ---
+// --- Schema User (Tambahkan field avatar) ---
 const userSchema = new mongoose.Schema({
   id: String,
   username: { type: String, unique: true },
@@ -30,7 +30,8 @@ const userSchema = new mongoose.Schema({
   bank_name: String,
   bank_number: String,
   balance: Number,
-  isAdmin: Boolean
+  isAdmin: Boolean,
+  avatar: { type: String, default: 'https://ui-avatars.com/api/?name=User&background=random' }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -49,7 +50,8 @@ const User = mongoose.model('User', userSchema);
       bank_name: '',
       bank_number: '',
       balance: 999999,
-      isAdmin: true
+      isAdmin: true,
+      avatar: 'https://ui-avatars.com/api/?name=Admin&background=ffc107&color=000'
     });
     await newAdmin.save();
     console.log('✅ Admin account created');
@@ -84,7 +86,7 @@ function calculateValue(hand) {
   return sum % 10;
 }
 
-// --- 100 Tables (In-Memory) ---
+// --- 100 Tables ---
 let tables = {};
 for (let i = 1; i <= 100; i++) {
   const stake = i <= 20 ? 1000 : (i <= 50 ? 5000 : (i <= 80 ? 10000 : 50000));
@@ -108,6 +110,8 @@ for (let i = 1; i <= 100; i++) {
 }
 
 // --- API Routes ---
+
+// Register
 app.post('/api/register', async (req, res) => {
   const { username, password, confirm_password, name, phone_wa, email, bank_name, bank_number } = req.body;
   if (!username || !password || !confirm_password || !name || !phone_wa || !email || !bank_name || !bank_number) {
@@ -131,7 +135,8 @@ app.post('/api/register', async (req, res) => {
     bank_name,
     bank_number,
     balance: 10000,
-    isAdmin: false
+    isAdmin: false,
+    avatar: `https://ui-avatars.com/api/?name=${name}&background=random`
   });
   await newUser.save();
 
@@ -146,11 +151,13 @@ app.post('/api/register', async (req, res) => {
       bank_name: newUser.bank_name,
       bank_number: newUser.bank_number,
       balance: newUser.balance,
-      isAdmin: newUser.isAdmin
+      isAdmin: newUser.isAdmin,
+      avatar: newUser.avatar
     }
   });
 });
 
+// Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
@@ -168,16 +175,18 @@ app.post('/api/login', async (req, res) => {
       bank_name: user.bank_name,
       bank_number: user.bank_number,
       balance: user.balance,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      avatar: user.avatar
     }
   });
 });
 
+// Update Profile (Termasuk Avatar)
 app.post('/api/profile', async (req, res) => {
-  const { userId, name, phone_wa, email, bank_name, bank_number } = req.body;
+  const { userId, name, phone_wa, email, bank_name, bank_number, avatar } = req.body;
   await User.updateOne(
     { id: userId },
-    { $set: { name, phone_wa, email, bank_name, bank_number } }
+    { $set: { name, phone_wa, email, bank_name, bank_number, avatar } }
   );
   const user = await User.findOne({ id: userId });
   res.json({
@@ -191,11 +200,13 @@ app.post('/api/profile', async (req, res) => {
       bank_name: user.bank_name,
       bank_number: user.bank_number,
       balance: user.balance,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      avatar: user.avatar
     }
   });
 });
 
+// Admin routes
 app.get('/api/admin/users', async (req, res) => {
   const users = await User.find({}, { password: 0 });
   res.json(users);
@@ -243,7 +254,8 @@ io.on('connection', (socket) => {
         hand: [],
         isBot: false,
         tableId: tableId,
-        username: user.username
+        username: user.username,
+        avatar: user.avatar
       };
       table.players.push(newPlayer);
       socket.join(`table_${tableId}`);
@@ -253,7 +265,8 @@ io.on('connection', (socket) => {
           name: p.name,
           chips: p.chips,
           hand: p.hand,
-          isBot: p.isBot
+          isBot: p.isBot,
+          avatar: p.avatar
         })),
         stake: table.stake,
         status: table.status
@@ -273,7 +286,7 @@ io.on('connection', (socket) => {
     const table = tables[tableId];
     if (!table) return;
     table.players = table.players.filter(p => p.id !== userId);
-    io.to(`table_${tableId}`).emit('updateTable', { players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot })), stake: table.stake, status: table.status });
+    io.to(`table_${tableId}`).emit('updateTable', { players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot, avatar: p.avatar })), stake: table.stake, status: table.status });
     io.emit('tableList', Object.values(tables).map(t => ({ id: t.id, stake: t.stake, playerCount: t.players.length, status: t.status, maxPlayers: t.maxPlayers })));
   });
 
@@ -316,7 +329,7 @@ io.on('connection', (socket) => {
         Promise.all(updates).then(() => {
           table.status = 'playing';
           io.to(`table_${tableId}`).emit('gameResult', {
-            players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot })),
+            players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot, avatar: p.avatar })),
             results: results,
             bandarVal: bandarVal
           });
@@ -324,7 +337,7 @@ io.on('connection', (socket) => {
             table.status = 'waiting';
             for (let p of table.players) p.hand = [];
             io.to(`table_${tableId}`).emit('updateTable', {
-              players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot })),
+              players: table.players.map(p => ({ id: p.id, name: p.name, chips: p.chips, hand: p.hand, isBot: p.isBot, avatar: p.avatar })),
               stake: table.stake,
               status: 'waiting'
             });

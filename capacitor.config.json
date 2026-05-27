@@ -1,0 +1,9 @@
+{
+  "appId": "com.bandarq.royale",
+  "appName": "BandarQRoyale",
+  "webDir": "public",
+  "server": {
+    "url": "https://bandarq-royale-2.onrender.com",
+    "cleartext": true
+  }
+}
